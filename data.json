@@ -1,7 +1,19 @@
 {
   "teachers": [
+    {
+      "id": 1,
+      "firstname": "quentin",
+      "lastname": "potie",
+      "skills": [
+        {
+          "field": 5,
+          "level": 7
+        }
+      ]
+    }
   ],
   "requests": [
+
   ],
   "fields": [
     {
