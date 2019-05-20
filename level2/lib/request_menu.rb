@@ -1,15 +1,4 @@
-class RequestMenu
-  attr_accessor :data_filename
-
-  def initialize(data_filename:)
-    @data_filename = data_filename
-    # build records from json
-    @fields = build_fields_from_data
-    @levels = build_levels_from_data
-    @teachers = build_teachers_from_data
-    @requests = build_requests_from_data
-  end
-
+class RequestMenu < Menu
   # MAIN MENU
 
   def call
@@ -43,38 +32,52 @@ class RequestMenu
     call
   end
 
-  # FUNCTIONS RELATED TO TEACHERS
+  # FUNCTIONS
 
-  def display_requests
-    format = '%-5s %-15s %s'
-    print "\n    " + format(format, 'Id', 'Firstname', 'Lastname')
-    @teachers.each do |teacher|
-      print "\n    " + format(format, teacher.id, teacher.firstname, teacher.lastname)
-    end
-    print "\n\n"
-  end
-
-  def new_request
+  def new_request()
     # Auto choose id
-    id = @teachers.empty? ? 1 : @teachers.last.id + 1
+    id = @requests.empty? ? 1 : @requests.last.id + 1
 
-    # Ask for new teacher's name
-    print "Teacher's firstname ?"; fn = gets.chomp
-    print "Teacher's lastname ?"; ln = gets.chomp
+    # Ask for new client's name
+    print "Client's firstname ?"; fn = gets.chomp
+    print "Client's lastname ?"; ln = gets.chomp
 
-    # Create teacher
-    @teachers << t = Teacher.new(id, fn, ln)
-    p 'Do you want to add skills to the teacher ? y/n '
-    add_skills_to_teacher(t) if gets.chomp == 'y'
+    # Ask for the skill's field
+    display_fields
+    print 'what field does (s)he wants to learn ? Enter a number'
+    answer = gets.chomp
+    field = @fields.select { |f| f.id == answer.to_i }.first
+
+    # Ask for the skill's level
+    display_levels
+    print "At which level does (s)he wants to learn #{field.name} ? Enter a number"
+    answer = gets.chomp
+    level = @levels.select { |l| l.id == answer.to_i }.first
+
+    print 'Searching ...'
+
+    # Assemble skill and search for teachers
+    skill = { field: field, level: level }
+    potent_teachers = @teachers.select { |t| t.skills.include?(skill) }
+
+    # Cancel request if no teacher matches
+    if potent_teachers.empty?
+      print 'Sorry but no teachers with this skill is available at the moment'
+      return
+    end
+
+    # If at least one teacher matches, create request
+    teacher = potent_teachers.sample
+    @requests << r = Request.new(id, fn, ln, level, field, teacher)
 
     # Display summary
     printf "
-  teacher created !
-  id: #{t.id}
-  firstname: #{t.firstname}
-  lastname: #{t.lastname}
-  skill:
-  #{display_skills(t)}
+  request created !
+  id: #{r.id}
+  client: #{r.client_firstname} #{r.client_lastname}
+  level: #{r.level.grade}, #{r.level.cycle}
+  field: #{r.field.name}
+  teacher selected: #{r.selected_teacher.firstname} #{r.selected_teacher.lastname}
     "
   end
 
@@ -86,7 +89,9 @@ class RequestMenu
   def select_request
     print "Enter the id of the request (enter 's' to show requests)"
     case answer = gets.chomp.to_i
-    when 's' then display_requests; return select_request
+    when 's'
+      display_requests
+      return select_request
     else return @requests.select { |t| t.id == answer.to_i }.first
     end
   end
@@ -102,47 +107,5 @@ class RequestMenu
     end
 
     p 'Saved in JSON'
-  end
-
-  private
-
-  def open_and_parse_data
-    JSON.parse(File.read(@data_filename))
-  end
-
-  def build_teachers_from_data
-    teachers_json = open_and_parse_data.fetch('teachers')
-    teachers = teachers_json.map do |h1|
-      Teacher.new(
-        h1['id'], h1['firstname'], h1['lastname'],
-        h1['skills'].map { |h2| { field: @fields.select { |f| f.id == h2['field'] }.first, level: @levels.select { |l| l.id == h2['level'] }.first } }
-      )
-    end
-    teachers.sort_by!(&:id)
-  end
-
-  def build_fields_from_data
-    fields = open_and_parse_data.fetch('fields')
-    fields.map! { |h| Field.new(h['id'], h['name']) }
-    fields.sort_by!(&:id)
-  end
-
-  def build_levels_from_data
-    levels = open_and_parse_data.fetch('levels')
-    levels.map! { |h| Level.new(h['id'], h['grade'], h['cycle']) }
-    levels.sort_by!(&:id)
-  end
-
-  def build_requests_from_data
-    requests_json = open_and_parse_data.fetch('requests')
-    requests = requests_json.map do |h1|
-      Request.new(
-        h1['id'],
-        h1['client_full_name'],
-        @levels.select { |l| l.id == h2['level'] }.first,
-        @fields.select { |f| f.id == h2['field'] }.first
-      )
-    end
-    requests.sort_by!(&:id)
   end
 end

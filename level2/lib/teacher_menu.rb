@@ -1,14 +1,4 @@
-class TeacherMenu
-  attr_accessor :data_filename
-
-  def initialize(data_filename:)
-    @data_filename = data_filename
-    # build teachers records from json
-    @fields = build_fields_from_data
-    @levels = build_levels_from_data
-    @teachers = build_teachers_from_data
-  end
-
+class TeacherMenu < Menu
   # MAIN MENU
 
   def call
@@ -46,16 +36,9 @@ class TeacherMenu
     call
   end
 
-  # FUNCTIONS RELATED TO TEACHERS
+  private
 
-  def display_teachers
-    format = '%-5s %-15s %s'
-    print "\n    " + format(format, 'Id', 'Firstname', 'Lastname')
-    @teachers.each do |teacher|
-      print "\n    " + format(format, teacher.id, teacher.firstname, teacher.lastname)
-    end
-    print "\n\n"
-  end
+  # METHODS RELATED TO TEACHERS
 
   def add_new_teacher
     # Auto choose id
@@ -96,12 +79,14 @@ class TeacherMenu
   def select_teacher
     print "Enter the id of the teacher (enter 's' to show teachers)"
     case answer = gets.chomp.to_i
-    when 's' then display_teachers; return select_teacher
+    when 's'
+      display_teachers
+      return select_teacher
     else return @teachers.select { |t| t.id == answer.to_i }.first
     end
   end
 
-  # FUNCTIONS RELATED TO SKILLS
+  # METHODS RELATED TO SKILLS
 
   def update_teacher_skills(teacher)
     printf "
@@ -165,24 +150,6 @@ class TeacherMenu
     print "\n\n"
   end
 
-  def display_fields
-    format = '%-5s %s'
-    print "\n    " + format(format, 'Id', 'Name')
-    @fields.each do |field|
-      print "\n    " + format(format, field.id, field.name)
-    end
-    print "\n\n"
-  end
-
-  def display_levels
-    format = '%-5s %-15s %s'
-    print "\n    " + format(format, 'Id', 'Grade', 'Cycle')
-    @levels.each do |level|
-      print "\n    " + format(format, level.id, level.grade, level.cycle)
-    end
-    print "\n\n"
-  end
-
   # SAVE IN JSON
 
   def rewrite_teachers
@@ -194,34 +161,5 @@ class TeacherMenu
     end
 
     p 'Saved in JSON'
-  end
-
-  private
-
-  def open_and_parse_data
-    JSON.parse(File.read(@data_filename))
-  end
-
-  def build_teachers_from_data
-    teachers_json = open_and_parse_data.fetch('teachers')
-    teachers = teachers_json.map do |h1|
-      Teacher.new(
-        h1['id'], h1['firstname'], h1['lastname'],
-        h1['skills'].map { |h2| { field: @fields.select { |f| f.id == h2['field'] }.first, level: @levels.select { |l| l.id == h2['level'] }.first } }
-      )
-    end
-    teachers.sort_by!(&:id)
-  end
-
-  def build_fields_from_data
-    fields = open_and_parse_data.fetch('fields')
-    fields.map! { |h| Field.new(h['id'], h['name']) }
-    fields.sort_by!(&:id)
-  end
-
-  def build_levels_from_data
-    levels = open_and_parse_data.fetch('levels')
-    levels.map! { |h| Level.new(h['id'], h['grade'], h['cycle']) }
-    levels.sort_by!(&:id)
   end
 end

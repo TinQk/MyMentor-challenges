@@ -1,11 +1,4 @@
-class MainMenu
-  attr_accessor :data_filename
-
-  def initialize(data_filename:)
-    @data_filename = data_filename
-    @data_parsed_content = open_and_parse_data
-  end
-
+class MainMenu < Menu
   def call
     printf "
     - MAIN MENU -
@@ -25,11 +18,5 @@ class MainMenu
     else print 'Please enter a valid command.'
     end
     call
-  end
-
-  private
-
-  def open_and_parse_data
-    JSON.parse(File.read(@data_filename))
   end
 end
