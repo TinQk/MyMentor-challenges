@@ -8,5 +8,6 @@ class Level
   end
 
   private
+
   attr_writer :id, :grade, :cycle
 end

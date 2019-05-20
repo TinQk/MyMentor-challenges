@@ -10,13 +10,14 @@ class Teacher
 
   def to_json
     {
-      id: self.id,
-      firstname: self.firstname,
-      lastname: self.lastname,
-      skills: self.skills.map { |h| h.transform_values(&:id) }
+      id: id,
+      firstname: firstname,
+      lastname: lastname,
+      skills: skills.map { |h| h.transform_values(&:id) }
     }
   end
 
   private
+
   attr_writer :id, :firstname, :lastname, :skills
 end

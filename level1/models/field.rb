@@ -7,5 +7,6 @@ class Field
   end
 
   private
+
   attr_writer :id, :name
 end

@@ -8,6 +8,21 @@
         {
           "field": 5,
           "level": 7
+        },
+        {
+          "field": 4,
+          "level": 5
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "firstname": "Laurie",
+      "lastname": "Czr",
+      "skills": [
+        {
+          "field": 2,
+          "level": 3
         }
       ]
     }

@@ -16,13 +16,13 @@ class MainMenu
     3. Exit application
     "
 
-    case answer = gets.chomp
-      when "1" then p open_and_parse_data
-      when "2" then return TeacherMenu.new(data_filename: @data_filename).call
-      when "3" then return
-      else print "Please enter a valid command."
+    case gets.chomp
+    when '1' then p open_and_parse_data
+    when '2' then return TeacherMenu.new(data_filename: @data_filename).call
+    when '3' then return
+    else print 'Please enter a valid command.'
     end
-    return call
+    call
   end
 
   private
