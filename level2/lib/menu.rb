@@ -45,7 +45,8 @@ class Menu
         request.client_firstname + ' ' + request.client_lastname,
         request.level.grade + ' ' + request.level.cycle,
         request.field.name,
-        request.selected_teacher.firstname + ' ' + request.selected_teacher.lastname)
+        request.selected_teacher.firstname + ' ' + request.selected_teacher.lastname
+      )
     end
     print "\n\n"
   end

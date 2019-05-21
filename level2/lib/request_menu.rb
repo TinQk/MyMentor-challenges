@@ -34,7 +34,7 @@ class RequestMenu < Menu
 
   # FUNCTIONS
 
-  def new_request()
+  def new_request
     # Auto choose id
     id = @requests.empty? ? 1 : @requests.last.id + 1
 
