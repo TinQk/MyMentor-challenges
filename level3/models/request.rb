@@ -30,7 +30,7 @@ class Request
     courses.each do |h|
       hours += h[:length]
     end
-    hours * price_per_hour
+    price_per_hour ? hours * price_per_hour : 0
   end
 
   private

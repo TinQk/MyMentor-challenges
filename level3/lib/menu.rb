@@ -36,8 +36,8 @@ class Menu
   end
 
   def display_requests
-    format = '%-5s %-25s %-25s %-15s %s'
-    print "\n    " + format(format, 'Id', 'Client', 'Level', 'Field', 'Selected teacher')
+    format = '%-5s %-20s %-15s %-15s %-20s %-15s %-15s %-s'
+    print "\n    " + format(format, 'Id', 'Client', 'Level', 'Field', 'Selected teacher', 'price_per_hour', 'nb courses', 'total_price')
     @requests.each do |request|
       print "\n    " + format(
         format,
@@ -45,7 +45,10 @@ class Menu
         request.client_firstname + ' ' + request.client_lastname,
         request.level.grade + ' ' + request.level.cycle,
         request.field.name,
-        request.selected_teacher.firstname + ' ' + request.selected_teacher.lastname
+        request.selected_teacher.firstname + ' ' + request.selected_teacher.lastname,
+        request.price_per_hour,
+        request.courses.count,
+        request.total_price
       )
     end
     print "\n\n"

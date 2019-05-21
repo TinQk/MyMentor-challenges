@@ -35,7 +35,7 @@ class TestTeacher < Test::Unit::TestCase
           }
         ]
       },
-      @teacher.to_json        
+      @teacher.to_json
     )
   end
 end

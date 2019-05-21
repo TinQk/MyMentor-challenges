@@ -8,9 +8,10 @@ class RequestMenu < Menu
     What do you want to do ?
     1. Display all requests
     2. Make a new request (search for a teacher)
-    3. Delete a request
-    4. Save modifications
-    5. Go back to main menu
+    3. Plan courses for a specific request
+    4. Delete a request
+    5. Save modifications
+    6. Go back to main menu
     "
 
     case gets.chomp
@@ -19,11 +20,12 @@ class RequestMenu < Menu
     when '2'
       new_request
     when '3'
-      display_requests
-      return delete_request(select_request)
+      add_courses(select_request)
     when '4'
-      rewrite_requests
+      delete_request(select_request)
     when '5'
+      rewrite_requests
+    when '6'
       return MainMenu.new(data_filename: @data_filename).call
     else
       print 'Please enter a valid command.'
@@ -66,9 +68,12 @@ class RequestMenu < Menu
       return
     end
 
+    # Add a random price_per_hour
+    price_per_hour = rand(10..30)
+
     # If at least one teacher matches, create request
     teacher = potent_teachers.sample
-    @requests << r = Request.new(id, fn, ln, level, field, teacher)
+    @requests << r = Request.new(id, fn, ln, level, field, teacher, price_per_hour)
 
     # Display summary
     printf "
@@ -78,6 +83,7 @@ class RequestMenu < Menu
   level: #{r.level.grade}, #{r.level.cycle}
   field: #{r.field.name}
   teacher selected: #{r.selected_teacher.firstname} #{r.selected_teacher.lastname}
+  price_per_hour: #{r.price_per_hour}
     "
   end
 
@@ -87,13 +93,22 @@ class RequestMenu < Menu
   end
 
   def select_request
-    print "Enter the id of the request (enter 's' to show requests)"
-    case answer = gets.chomp.to_i
-    when 's'
-      display_requests
-      return select_request
-    else return @requests.select { |t| t.id == answer.to_i }.first
-    end
+    display_requests
+    print "Enter the id of the request"
+    answer = gets.chomp
+    @requests.select { |t| t.id == answer.to_i }.first
+  end
+
+  def add_courses(request)
+    print "Enter a date for the course to plan (yyyy-mm-dd)"
+    date = gets.chomp.to_s
+    print "How long will last the course in hours ?"
+    length = gets.chomp.to_i
+
+    course = { date: date, length: length }
+    request.courses << course
+
+    print "Course created, don't forget to save your modifications."
   end
 
   # SAVE IN JSON
